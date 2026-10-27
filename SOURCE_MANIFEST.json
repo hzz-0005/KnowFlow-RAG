@@ -34,9 +34,9 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "cf9b823f35da381e7b5d1adc6e70370f546dbf46eb54670a6d419f42fdb3e0e0",
-      "original_source_sha256": "cf9b823f35da381e7b5d1adc6e70370f546dbf46eb54670a6d419f42fdb3e0e0",
-      "bytes": 660
+      "sha256": "40fa86c25acfa58e44d132cdddd3712742a25e9f43df872ec74728e44034e306",
+      "original_source_sha256": "40fa86c25acfa58e44d132cdddd3712742a25e9f43df872ec74728e44034e306",
+      "bytes": 1303
     },
     {
       "path": "CONTRIBUTING.md",
@@ -232,9 +232,9 @@
     },
     {
       "path": "backend/knowflow/app/document_reference.py",
-      "sha256": "cd2c50aad7b6c325f9f5e9f83fbe5a583786666e9d7200b2d74450e3efa7a6ce",
-      "original_source_sha256": "cd2c50aad7b6c325f9f5e9f83fbe5a583786666e9d7200b2d74450e3efa7a6ce",
-      "bytes": 13418
+      "sha256": "4682400109dd31b807d34516ae18d0ff43da9d8bd175dd57460642e9c4851f87",
+      "original_source_sha256": "4682400109dd31b807d34516ae18d0ff43da9d8bd175dd57460642e9c4851f87",
+      "bytes": 14879
     },
     {
       "path": "backend/knowflow/app/document_summary.py",
@@ -490,9 +490,9 @@
     },
     {
       "path": "backend/knowflow/app/retrieval.py",
-      "sha256": "3e62a40afa1469bdc700a9148d3baadfdef81e8e5846b7d1d98510486b3265cc",
-      "original_source_sha256": "3e62a40afa1469bdc700a9148d3baadfdef81e8e5846b7d1d98510486b3265cc",
-      "bytes": 34158
+      "sha256": "3aecfe04adf6638cdd76ba4fb98b3bfb810f6a98543b5c6c2b4ad117f5285b67",
+      "original_source_sha256": "3aecfe04adf6638cdd76ba4fb98b3bfb810f6a98543b5c6c2b4ad117f5285b67",
+      "bytes": 36454
     },
     {
       "path": "backend/knowflow/app/review_conversation_bundle.py",
@@ -879,6 +879,12 @@
       "bytes": 1889
     },
     {
+      "path": "backend/tests/test_named_scope_routing.py",
+      "sha256": "66c6f0af7ae431cfbdeed4ab9c681785c88d33295865bac591027d6993ac736d",
+      "original_source_sha256": "66c6f0af7ae431cfbdeed4ab9c681785c88d33295865bac591027d6993ac736d",
+      "bytes": 5211
+    },
+    {
       "path": "backend/tests/test_ocr_review.py",
       "sha256": "6db0b664389da8352fe67df63c98848eddcdac16bb0d5daa8de918f00e8444b5",
       "original_source_sha256": "6db0b664389da8352fe67df63c98848eddcdac16bb0d5daa8de918f00e8444b5",
@@ -937,6 +943,12 @@
       "sha256": "2217ad55df821e8f9b37201efc223e460576fd59459c2abadb45d1b28a612fe7",
       "original_source_sha256": "2217ad55df821e8f9b37201efc223e460576fd59459c2abadb45d1b28a612fe7",
       "bytes": 896
+    },
+    {
+      "path": "backend/tests/test_query_embedding_reuse.py",
+      "sha256": "0c604a66c78161eadbbb24c553d37214ab3d2e6b56b8d870fd5ef749d58efeac",
+      "original_source_sha256": "0c604a66c78161eadbbb24c553d37214ab3d2e6b56b8d870fd5ef749d58efeac",
+      "bytes": 7170
     },
     {
       "path": "backend/tests/test_query_plan.py",
@@ -1237,6 +1249,12 @@
       "sha256": "808cefb3cd6777279cc13e4ab0d6dbb2a2f4a63749316b5ec382f256409f8d45",
       "original_source_sha256": "808cefb3cd6777279cc13e4ab0d6dbb2a2f4a63749316b5ec382f256409f8d45",
       "bytes": 18382
+    },
+    {
+      "path": "docs/query-embedding-reuse.md",
+      "sha256": "65f6b398531357bee4c792044e0b23914b77321f874e6cd7888a66a750840d22",
+      "original_source_sha256": "65f6b398531357bee4c792044e0b23914b77321f874e6cd7888a66a750840d22",
+      "bytes": 3245
     },
     {
       "path": "docs/query-rewrite.md",

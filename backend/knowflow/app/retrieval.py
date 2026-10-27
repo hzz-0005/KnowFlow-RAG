@@ -126,6 +126,27 @@ def _query_variants(query: str) -> list[str]:
     return unique_parts or [query]
 
 
+def _retrieval_queries(query, strategy, search_queries):
+    queries = _query_variants(query)
+    if search_queries and strategy in {"hybrid", "hybrid_rerank", "graph_hybrid"}:
+        queries = list(dict.fromkeys([query, *search_queries, *queries]))[:MAX_QUERY_PARTS]
+    return queries
+
+
+async def _cached_vector_options(queries, settings, query_vectors):
+    """Reuse exact inputs inside one per-document retrieval call, never across users/rounds."""
+    if query_vectors is None:
+        return {}
+    missing = list(dict.fromkeys(q for q in queries if q not in query_vectors))
+    if missing:
+        values = await embed_texts(missing, settings)
+        # Do not populate a partial cache or silently associate the wrong query.
+        if len(values) != len(missing):
+            raise ValueError("Precomputed vector count must match the query count")
+        query_vectors.update(zip(missing, values, strict=True))
+    return {"vectors": [query_vectors[q] for q in queries]}
+
+
 def _keyword_terms(query: str) -> list[str]:
     """Drop punctuation-only tokens so operators do not become broad FTS terms."""
     terms = dict.fromkeys(searchable_text(query).split())
@@ -601,6 +622,7 @@ async def _nearest_after_gate(
     settings: Settings,
     *,
     vector: list[float] | None = None,
+    query_vectors: dict[str, list[float]] | None = None,
 ) -> list[RetrievalHit]:
     """Offer the nearest sources when the distance gate left the pool empty.
 
@@ -615,14 +637,17 @@ async def _nearest_after_gate(
     # A selected file is already a bounded search domain, so keep its k budget.
     recovery_limit = limit if isinstance(session, ScopedReadSession) else 1
     # Reuse the caller's vector only when the recovery asks for the same queries.
-    reusable = vector is not None and fallback_queries == list(queries)
+    options = await _cached_vector_options(fallback_queries, settings, query_vectors)
+    reusable = vector is not None and fallback_queries == list(queries) and len(queries) == 1
+    if not options and reusable:
+        options = {"vectors": [vector]}
     nearest = await _vector_search_many(
         session,
         knowledge_base_id,
         fallback_queries,
         recovery_limit,
         settings.model_copy(update={"rag_max_cosine_distance": 2}),
-        **({"vectors": [vector]} if reusable else {}),
+        **options,
     )
     for ranking in nearest:
         for hit in ranking:
@@ -630,9 +655,23 @@ async def _nearest_after_gate(
     return reciprocal_rank_fusion(nearest)[:limit]
 
 
-async def _hybrid_text_candidates(session, knowledge_base_id, query, queries, limit, settings):
+async def _hybrid_text_candidates(
+    session,
+    knowledge_base_id,
+    query,
+    queries,
+    limit,
+    settings,
+    *,
+    query_vectors=None,
+):
     vector_hits = await _vector_search_many(
-        session, knowledge_base_id, queries, limit * 3, settings
+        session,
+        knowledge_base_id,
+        queries,
+        limit * 3,
+        settings,
+        **await _cached_vector_options(queries, settings, query_vectors),
     )
     keyword_hits = [
         await _keyword_search(session, knowledge_base_id, item, limit * 3) for item in queries
@@ -647,7 +686,15 @@ async def _hybrid_text_candidates(session, knowledge_base_id, query, queries, li
         return await _append_english_candidates(
             session, knowledge_base_id, queries, base, limit, settings
         )
-    base = await _nearest_after_gate(session, knowledge_base_id, query, queries, limit, settings)
+    base = await _nearest_after_gate(
+        session,
+        knowledge_base_id,
+        query,
+        queries,
+        limit,
+        settings,
+        query_vectors=query_vectors,
+    )
     return await _append_english_candidates(
         session, knowledge_base_id, queries, base, limit, settings
     )
@@ -664,6 +711,7 @@ async def retrieve(
     search_queries: list[str] | None = None,
     document_ids: tuple[UUID, ...] | None = None,
     query_vector: list[float] | None = None,
+    query_vectors: dict[str, list[float]] | None = None,
 ) -> list[RetrievalHit]:
     """Retrieve authorized evidence; graph_hybrid returns text k plus up to k graph additions."""
     settings = settings or get_settings()
@@ -674,23 +722,27 @@ async def retrieve(
             return []
         session = ScopedReadSession(session, knowledge_base_id, document_ids)
     limit = top_k or settings.rag_top_k
-    queries = _query_variants(query)
-    if search_queries and strategy in {"hybrid", "hybrid_rerank", "graph_hybrid"}:
-        queries = list(dict.fromkeys([query, *search_queries, *queries]))[:MAX_QUERY_PARTS]
+    queries = _retrieval_queries(query, strategy, search_queries)
     if strategy == "vector":
         if len(queries) > 1:
             searches = await _vector_search_many(
-                session, knowledge_base_id, queries, limit * 3, settings
+                session,
+                knowledge_base_id,
+                queries,
+                limit * 3,
+                settings,
+                **await _cached_vector_options(queries, settings, query_vectors),
             )
             hits = reciprocal_rank_fusion(searches)[:limit]
         else:
+            options = await _cached_vector_options([query], settings, query_vectors)
             hits = await _vector_search(
                 session,
                 knowledge_base_id,
                 query,
                 limit,
                 settings,
-                vector=query_vector,
+                vector=options["vectors"][0] if options else query_vector,
             )
         if hits or not settings.retrieval_assessment_enabled:
             return hits
@@ -705,6 +757,7 @@ async def retrieve(
             limit,
             settings,
             vector=query_vector,
+            query_vectors=query_vectors,
         )
     if strategy == "keyword":
         if len(queries) > 1:
@@ -716,13 +769,24 @@ async def retrieve(
         return await _keyword_search(session, knowledge_base_id, query, limit)
     if strategy == "hybrid":
         return await _hybrid_text_candidates(
-            session, knowledge_base_id, query, queries, limit, settings
+            session,
+            knowledge_base_id,
+            query,
+            queries,
+            limit,
+            settings,
+            query_vectors=query_vectors,
         )
     if strategy == "hybrid_rerank":
         from knowflow.app.reranker import rerank_hits
 
         vector_hits = await _vector_search_many(
-            session, knowledge_base_id, queries, limit * 3, settings
+            session,
+            knowledge_base_id,
+            queries,
+            limit * 3,
+            settings,
+            **await _cached_vector_options(queries, settings, query_vectors),
         )
         keyword_hits = [
             await _keyword_search(session, knowledge_base_id, item, limit * 3) for item in queries
@@ -746,7 +810,13 @@ async def retrieve(
         return await _graph_search(session, knowledge_base_id, query, limit)
     if strategy == "graph_hybrid":
         base = await _hybrid_text_candidates(
-            session, knowledge_base_id, query, queries, limit, settings
+            session,
+            knowledge_base_id,
+            query,
+            queries,
+            limit,
+            settings,
+            query_vectors=query_vectors,
         )
         graph_lists = [
             await _graph_search(
@@ -785,11 +855,14 @@ async def retrieve_per_document(
     settings = settings or get_settings()
     total = top_k or settings.rag_top_k
     per_document = max(1, (total + len(ids) - 1) // len(ids))
-    # One question keeps one vector: N separate per-file searches must not spend
-    # N identical embedding calls, or the round budget is consumed by repeats.
-    query_vector = (
-        (await embed_texts([query], settings))[0] if strategy in VECTOR_STRATEGIES else None
-    )
+    # Embed actual recall variants in one batch. The local map is discarded when
+    # this call ends, and shares vectors only, never source results or SQL scope.
+    query_vectors = {} if strategy in VECTOR_STRATEGIES else None
+    if query_vectors is not None:
+        queries = _retrieval_queries(query, strategy, search_queries)
+        if strategy == "vector" and len(queries) == 1:
+            queries = [query]
+        await _cached_vector_options(queries, settings, query_vectors)
     groups: list[list[RetrievalHit]] = []
     for document_id in ids:
         hits = await retrieve(
@@ -801,7 +874,8 @@ async def retrieve_per_document(
             settings,
             search_queries=search_queries,
             document_ids=(document_id,),
-            query_vector=query_vector,
+            query_vector=query_vectors.get(query) if query_vectors is not None else None,
+            query_vectors=query_vectors,
         )
         if strategy == "vector":
             # A nearest-neighbour sample often misses the file's own wording. The

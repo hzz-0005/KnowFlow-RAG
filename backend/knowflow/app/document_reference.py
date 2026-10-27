@@ -18,13 +18,24 @@ PREFIX = re.compile(r"[A-Za-z][A-Za-z0-9]*(?:[_ -][A-Za-z][A-Za-z0-9]*)*")
 GENERIC = {"readme", "document", "report", "summary", "notes", "results", "project", "test"}
 REQUEST = re.compile(
     r"查询|查一下|查找|介绍|解释|总结|概括|干嘛|什么|多少|多久|为何|为什么|怎么|如何|计划|用途|作用|"
-    r"\b(?:what|why|how|when|describe|explain|summari[sz]e|overview|find|show)\b",
+    r"哪些|列出|比较|对比|\b(?:what|why|how|when|describe|explain|summari[sz]e|overview|find|show|list|compare)\b",
     re.I,
 )
 UNRESOLVED = re.compile(
     r"另(?:一)?(?:个|份|套|篇)|前者|后者|第[一二三\d]+个|\b(?:other|another|former|latter)\b", re.I
 )
 CORRECTION = re.compile(r"我(?:问|说|指)的是|不是.{0,80}(?:而是|是)|你为什么|你怎么")
+HISTORY_DEPENDENCY = re.compile(
+    r"刚才|上(?:轮|次|回)|前一个|上一个|前文|沿用|照着|"
+    r"之前(?:的)?(?:条件|规则|阈值|要求|限制|回答|问题)|"
+    r"\b(?:previous|earlier|as before|same (?:rule|condition|threshold))\b",
+    re.I,
+)
+SOURCE_HISTORY_EXCLUSION = re.compile(
+    r"(?:别|不要|不用|不再)(?:带上|引用|检索|查|看)(?:前一个|上一个|之前|刚才)(?:的)?(?:文档|文件|项目)|"
+    r"\bwithout (?:the )?(?:previous|last) (?:project|document|file)\b",
+    re.I,
+)
 DOCUMENT_FOLLOWUP = re.compile(
     r"这(?:份|篇|个)(?:文档|文件|报告|论文|材料)?|那(?:份|篇)(?:文档|文件|报告|论文|材料)?|"
     r"该文档|它|\b(?:it|this|that)\b",
@@ -254,14 +265,14 @@ async def resolve_document_reference(session, kb_id, question):
 
 
 def named_document_resolution(question, source_scope, version):
-    """A complete current lookup naming one file does not need old-topic rewriting.
+    """A self-contained lookup naming current files needs no old-topic rewriting.
 
     Corrections, missing ordinals and multi-object dependencies still go through
     the history interpreter, now with this source identity supplied.
     """
     if (
         source_scope.trace["status"] != "filtered"
-        or len(source_scope.document_ids or ()) != 1
+        or not 1 <= len(source_scope.document_ids or ()) <= 8
         or not REQUEST.search(question)
         or UNRESOLVED.search(question)
         or CORRECTION.search(question)
@@ -270,10 +281,25 @@ def named_document_resolution(question, source_scope, version):
     from knowflow.app.document_summary import NEGATIVE as NO_SUMMARY
     from knowflow.app.document_summary import document_cue
 
+    # Excluding the previous source needs no old facts. Positive references to
+    # earlier rules/thresholds still require history; do not drop any user text.
+    if HISTORY_DEPENDENCY.search(SOURCE_HISTORY_EXCLUSION.sub("", question)):
+        return None
+    multiple = len(source_scope.document_ids) > 1
+    if multiple and not (
+        source_scope.trace.get("selection_basis") == "multiple_literal_titles"
+        or all(
+            doc["filename"].casefold() in question.casefold()
+            for doc in source_scope.trace["documents"]
+        )
+    ):
+        return None  # An exclusion-derived set is not a set of current literal names.
     # A filename containing '总结' is not itself a request to summarize.
     text = question
     for doc in source_scope.trace["documents"]:
         text = re.sub(re.escape(doc["filename"]), "这份文档", text, flags=re.I)
+    if multiple and document_cue(text) and not NO_SUMMARY.search(text):
+        return None  # Keep multi-document whole-summary planning on its existing path.
     return {
         "version": version,
         "status": "standalone",
@@ -283,7 +309,7 @@ def named_document_resolution(question, source_scope, version):
         "request_kind": "document_summary"
         if document_cue(text) and not NO_SUMMARY.search(text)
         else "fact_lookup",
-        "routing_reason": "current_named_document",
+        "routing_reason": "current_named_documents" if multiple else "current_named_document",
         "latency_ms": 0,
         "request_attempted": False,
         "response_received": False,
