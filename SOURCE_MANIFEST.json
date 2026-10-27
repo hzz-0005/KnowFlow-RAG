@@ -874,9 +874,9 @@
     },
     {
       "path": "backend/tests/test_multi_doc_retrieval.py",
-      "sha256": "ffd9af31d0fe7b7a3512a92319d909c7abca2a43bb27f52bfc5b37aea247966d",
-      "original_source_sha256": "ffd9af31d0fe7b7a3512a92319d909c7abca2a43bb27f52bfc5b37aea247966d",
-      "bytes": 1613
+      "sha256": "7caacc8d7b4abbc123eeade5eb8ef30d3191d75d24f8f6c028b987bad0c7ed58",
+      "original_source_sha256": "7caacc8d7b4abbc123eeade5eb8ef30d3191d75d24f8f6c028b987bad0c7ed58",
+      "bytes": 1889
     },
     {
       "path": "backend/tests/test_ocr_review.py",
@@ -1012,9 +1012,9 @@
     },
     {
       "path": "backend/tests/test_retrieval.py",
-      "sha256": "4092047c97833071e4d07a2e506e661027938706ecf30f9a17ffb83e8c646145",
-      "original_source_sha256": "4092047c97833071e4d07a2e506e661027938706ecf30f9a17ffb83e8c646145",
-      "bytes": 17113
+      "sha256": "748bdc8e39da8a6adead74279468deb00a1331fff25d4d4f4e8dbfae559ebb42",
+      "original_source_sha256": "748bdc8e39da8a6adead74279468deb00a1331fff25d4d4f4e8dbfae559ebb42",
+      "bytes": 17477
     },
     {
       "path": "backend/tests/test_round_budget.py",
@@ -1629,18 +1629,6 @@
       "bytes": 47833
     },
     {
-      "path": "frontend/preview/consistency.html",
-      "sha256": "842d46fdb6d53b7b1b9599c61b8fa3720f6b997478a08ebe354fe97e0202a24b",
-      "original_source_sha256": "842d46fdb6d53b7b1b9599c61b8fa3720f6b997478a08ebe354fe97e0202a24b",
-      "bytes": 29469
-    },
-    {
-      "path": "frontend/preview/redesign.html",
-      "sha256": "a2d4cbd9ecf1f58ca7df032f7a699adf421dabf00f4bb18ac7f7eb24aa39bd33",
-      "original_source_sha256": "a2d4cbd9ecf1f58ca7df032f7a699adf421dabf00f4bb18ac7f7eb24aa39bd33",
-      "bytes": 10661
-    },
-    {
       "path": "frontend/reference-view.js",
       "sha256": "1ae4564b69199fd2fe50317b1a5cc19a4247afcbd21b9e2f3a223efe7a195572",
       "original_source_sha256": "1ae4564b69199fd2fe50317b1a5cc19a4247afcbd21b9e2f3a223efe7a195572",
@@ -1978,9 +1966,9 @@
     },
     {
       "path": "scripts/public_files.py",
-      "sha256": "d629c85c04f6776ee2c030f8aa56480eb403892fb49f65644eb0759a2b7cc5f7",
-      "original_source_sha256": "d629c85c04f6776ee2c030f8aa56480eb403892fb49f65644eb0759a2b7cc5f7",
-      "bytes": 4213
+      "sha256": "8f99d15cce97a3b3f2c12f20ea8c8faecda491cefa42c544fe95016489105430",
+      "original_source_sha256": "8f99d15cce97a3b3f2c12f20ea8c8faecda491cefa42c544fe95016489105430",
+      "bytes": 4279
     },
     {
       "path": "scripts/run_tests.py",

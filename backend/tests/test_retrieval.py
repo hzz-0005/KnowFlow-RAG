@@ -379,7 +379,11 @@ async def test_per_document_sweep_flags_only_the_files_sampled_after_the_gate(mo
     documents = [uuid4() for _ in range(3)]
     silent = documents[0]
 
+    async def embed(_queries, _settings):
+        return [[0.1, 0.2]]
+
     async def search(session, _kb, _queries, limit, settings, **kwargs):
+        assert kwargs["vectors"] == [[0.1, 0.2]]
         # Only the first file empties under the distance gate and needs a sample.
         if not (
             settings.rag_max_cosine_distance == 2 or silent not in session.document_ids
@@ -388,6 +392,7 @@ async def test_per_document_sweep_flags_only_the_files_sampled_after_the_gate(mo
         return [[_hit(uuid4()) for _ in range(limit)]]
 
     monkeypatch.setattr(retrieval, "_vector_search_many", search)
+    monkeypatch.setattr(retrieval, "embed_texts", embed)
     monkeypatch.setattr(retrieval, "_keyword_search", _no_lexical)
     settings = Settings(_env_file=None)
     hits = await retrieval.retrieve_per_document(
@@ -415,7 +420,11 @@ async def test_per_document_sweep_adds_each_files_own_lexical_evidence(monkeypat
     lexical_id = uuid4()
     lexical_calls = []
 
+    async def embed(_queries, _settings):
+        return [[0.1, 0.2]]
+
     async def vectors(_session, _kb, _queries, limit, _settings, **kwargs):
+        assert kwargs["vectors"] == [[0.1, 0.2]]
         # Nearest neighbours alone: these two are the sample, never a lexical match.
         return [[_hit(uuid4()) for _ in range(limit)]]
 
@@ -428,6 +437,7 @@ async def test_per_document_sweep_adds_each_files_own_lexical_evidence(monkeypat
         return [hit] if session.document_ids[0] == documents[1] else []
 
     monkeypatch.setattr(retrieval, "_vector_search_many", vectors)
+    monkeypatch.setattr(retrieval, "embed_texts", embed)
     monkeypatch.setattr(retrieval, "_keyword_search", keyword)
     hits = await retrieval.retrieve_per_document(
         None,

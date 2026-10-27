@@ -17,20 +17,28 @@ def hit(document_id, label):
 async def test_each_named_document_contributes_evidence(monkeypatch):
     seen_scopes = []
     docs = [uuid4(), uuid4(), uuid4()]
+    embed_calls = []
+
+    async def embed(queries, _settings):
+        embed_calls.append(queries)
+        return [[0.1, 0.2]]
 
     async def fake_retrieve(_session, _kb, _query, _strategy, top_k, _settings, **kwargs):
         scopes = kwargs.get("document_ids") or ()
+        assert kwargs["query_vector"] == [0.1, 0.2]
         seen_scopes.extend(scopes)
         document_id = scopes[0]
         return [hit(document_id, f"doc-{index}") for index in range(top_k)]
 
     monkeypatch.setattr(retrieval, "retrieve", fake_retrieve)
+    monkeypatch.setattr(retrieval, "embed_texts", embed)
 
     merged = await retrieval.retrieve_per_document(
         None, uuid4(), "compare", "hybrid", 6, None, document_ids=tuple(docs)
     )
 
     assert set(seen_scopes) == set(docs)
+    assert embed_calls == [["compare"]]
     assert {row.chunk.document_id for row in merged} == set(docs)
 
 

@@ -61,6 +61,8 @@ ASSET_FILES = {
 def allowed(relative):
     p = Path(relative)
     name = p.as_posix()
+    if name.startswith("frontend/preview/"):
+        return False
     if (
         p.is_absolute()
         or ".." in p.parts
