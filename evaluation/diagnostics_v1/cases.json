@@ -1,0 +1,23 @@
+{
+  "schema": "knowflow.integrity-controls.v1",
+  "scope": "Synthetic software controls; not parser accuracy, semantic gold, or generalization evidence.",
+  "cases": [
+    {"id":"clean_md","source":"flow.md","mutation":"none","role":"negative_control","forbid_severities":["error"]},
+    {"id":"clean_docx","source":"flow.docx","mutation":"none","role":"negative_control","forbid_severities":["error"]},
+    {"id":"clean_csv","source":"service-control.csv","mutation":"none","role":"negative_control","forbid_severities":["error"]},
+    {"id":"clean_xlsx","source":"inventory-control.xlsx","mutation":"none","role":"negative_control","forbid_severities":["error"]},
+    {"id":"missing_source","source":"flow.md","mutation":"missing_source","role":"fault_control","expect_code":"source_missing","expect_severity":"unknown"},
+    {"id":"dangling_block","source":"flow.md","mutation":"dangling_block","role":"fault_control","expect_code":"dangling_block","expect_severity":"error"},
+    {"id":"chunk_range","source":"flow.md","mutation":"chunk_range","role":"fault_control","expect_code":"invalid_chunk_range","expect_severity":"error"},
+    {"id":"text_range","source":"flow.md","mutation":"text_range","role":"fault_control","expect_code":"invalid_text_range","expect_severity":"error"},
+    {"id":"invalid_region","source":"flow.md","mutation":"invalid_region","role":"fault_control","expect_code":"invalid_bbox","expect_severity":"error"},
+    {"id":"over_budget","source":"flow.md","mutation":"over_budget","role":"fault_control","expect_code":"token_over_budget","expect_severity":"error"},
+    {"id":"bad_cell","source":"inventory-control.xlsx","mutation":"bad_cell","role":"fault_control","expect_code":"invalid_cell_location","expect_severity":"error"},
+    {"id":"old_tokenizer","source":"flow.md","mutation":"old_tokenizer","role":"unknown_control","expect_code":"token_policy_unknown","expect_severity":"unknown","forbid_codes":["token_over_budget"]},
+    {"id":"withheld_sources","source":"flow.md","mutation":"withheld_sources","role":"unknown_control","expect_code":"source_missing","expect_severity":"unknown","forbid_codes":["unreferenced_block","page_without_chunk_source"]},
+    {"id":"partial_blocks","source":"flow.md","mutation":"partial_blocks","role":"unknown_control","expect_code":"inspection_incomplete","expect_severity":"unknown","forbid_codes":["dangling_block"]},
+    {"id":"duplicate_context","source":"flow.md","mutation":"duplicate_context","role":"boundary_control","expect_code":"duplicate_content","expect_severity":"info","forbid_severities":["error"]},
+    {"id":"blank_page_projection","source":"flow.md","mutation":"blank_page_projection","role":"boundary_control","expect_code":"page_without_chunk_source","expect_severity":"warning","forbid_severities":["error"]},
+    {"id":"semantic_blind_spot","source":"flow.md","mutation":"same_length_replacement","role":"unsupported_semantics","forbid_severities":["error"],"note":"Same-length unrelated text keeps legal coordinates; the checker does not validate source-text agreement or semantics."}
+  ]
+}

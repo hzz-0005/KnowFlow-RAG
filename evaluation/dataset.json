@@ -1,0 +1,203 @@
+{
+  "version": "knowflow-synthetic-v2-quality",
+  "source": "Original synthetic technical runbook written for KnowFlow retrieval evaluation.",
+  "cases": [
+    {
+      "id": "single-fact-region",
+      "question_type": "single_fact",
+      "question": "Which region hosts the Mercury production service?",
+      "reference_answer": "The Beijing region.",
+      "should_refuse": false,
+      "relevant_evidence": [
+        {
+          "id": "mercury-prod-region",
+          "filename": "deployment.md",
+          "contains": "deployed in the Beijing region"
+        }
+      ],
+      "tags": [
+        "deployment"
+      ],
+      "equivalence_group": "mercury-region"
+    },
+    {
+      "id": "exact-queue-table",
+      "question_type": "exact_keyword",
+      "question": "What is the exact PostgreSQL table used for Mercury job payloads?",
+      "reference_answer": "task_queue.",
+      "should_refuse": false,
+      "relevant_evidence": [
+        {
+          "id": "job-payload-table",
+          "filename": "storage.md",
+          "contains": "table task_queue"
+        }
+      ],
+      "tags": [
+        "identifier",
+        "database"
+      ]
+    },
+    {
+      "id": "semantic-transient-retry",
+      "question_type": "semantic_paraphrase",
+      "question": "How many attempts does the worker make when a temporary HTTP 503 occurs?",
+      "reference_answer": "It retries three times.",
+      "should_refuse": false,
+      "relevant_evidence": [
+        {
+          "id": "http-503-retry-policy",
+          "filename": "deployment.md",
+          "contains": "retries transient HTTP 503 responses three times"
+        }
+      ],
+      "tags": [
+        "retry",
+        "semantic"
+      ]
+    },
+    {
+      "id": "cross-document-traffic-and-region",
+      "question_type": "cross_document",
+      "question": "Which component receives API Gateway traffic, and where is it deployed?",
+      "reference_answer": "The API Gateway routes to the Mercury worker, and the production service runs in Beijing.",
+      "should_refuse": false,
+      "relevant_evidence": [
+        {
+          "id": "gateway-target",
+          "filename": "gateway.md",
+          "contains": "API Gateway routes traffic to the Mercury worker"
+        },
+        {
+          "id": "mercury-prod-region-cross",
+          "filename": "deployment.md",
+          "contains": "deployed in the Beijing region"
+        }
+      ],
+      "tags": [
+        "cross_document"
+      ]
+    },
+    {
+      "id": "two-hop-storage-path",
+      "question_type": "multi_hop",
+      "question": "Which database stores payloads for the worker that the API Gateway routes to?",
+      "reference_answer": "The API Gateway routes to the Mercury worker, which stores job payloads in PostgreSQL.",
+      "should_refuse": false,
+      "relevant_evidence": [
+        {
+          "id": "gateway-to-worker",
+          "filename": "gateway.md",
+          "contains": "API Gateway routes traffic to the Mercury worker"
+        },
+        {
+          "id": "worker-to-postgres",
+          "filename": "storage.md",
+          "contains": "stores job payloads in the PostgreSQL table task_queue"
+        }
+      ],
+      "tags": [
+        "multi_hop",
+        "cross_document"
+      ],
+      "equivalence_group": "gateway-storage-path"
+    },
+    {
+      "id": "unknown-staging-account",
+      "question_type": "no_answer",
+      "question": "What is the exact AWS account number for the staging environment?",
+      "reference_answer": "The corpus does not contain this information.",
+      "should_refuse": true,
+      "relevant_evidence": [],
+      "tags": [
+        "refusal"
+      ]
+    },
+    {
+      "id": "distractor-retention-period",
+      "question_type": "distractor",
+      "question": "Is task_queue retained for seven days or 30 days?",
+      "reference_answer": "task_queue is retained for seven days; the 30-day period applies to API request logs.",
+      "should_refuse": false,
+      "relevant_evidence": [
+        {
+          "id": "queue-retention",
+          "filename": "storage.md",
+          "contains": "task_queue retention period is seven days"
+        }
+      ],
+      "tags": [
+        "distractor",
+        "exact_term"
+      ]
+    },
+    {
+      "id": "single-fact-region-zh",
+      "question_type": "cross_lingual",
+      "question": "Mercury 生产服务部署在哪个区域？",
+      "reference_answer": "北京区域。",
+      "should_refuse": false,
+      "equivalence_group": "mercury-region",
+      "relevant_evidence": [
+        {
+          "id": "region-zh",
+          "filename": "deployment.md",
+          "contains": "deployed in the Beijing region"
+        }
+      ]
+    },
+    {
+      "id": "two-hop-storage-path-zh",
+      "question_type": "multi_hop",
+      "question": "API Gateway 路由到的 worker 把任务负载存在哪个数据库？",
+      "reference_answer": "API Gateway 路由到 Mercury worker，该 worker 将任务负载存入 PostgreSQL。",
+      "should_refuse": false,
+      "equivalence_group": "gateway-storage-path",
+      "relevant_evidence": [
+        {
+          "id": "gateway-worker-zh",
+          "filename": "gateway.md",
+          "contains": "API Gateway routes traffic to the Mercury worker"
+        },
+        {
+          "id": "worker-postgres-zh",
+          "filename": "storage.md",
+          "contains": "stores job payloads in the PostgreSQL table task_queue"
+        }
+      ]
+    },
+    {
+      "id": "old-version-timeout",
+      "question_type": "version_scope",
+      "question": "按照 Atlas gateway 的 2025 年生产策略，超时阈值是多少？不是问 2026 版。",
+      "reference_answer": "30 ms，45 ms 是 2026 版。",
+      "should_refuse": false,
+      "relevant_evidence": [
+        {
+          "id": "old-timeout",
+          "filename": "version-policy.md",
+          "contains": "For the Atlas gateway production policy version 2025, the timeout threshold is 30 ms."
+        }
+      ]
+    },
+    {
+      "id": "negative-production-permission",
+      "question_type": "negation_scope",
+      "question": "Atlas gateway 在生产环境能否把请求正文写入 Redis？测试环境允许是否意味着生产也允许？",
+      "reference_answer": "生产禁止；staging 只允许调试用合成请求正文，不能套用到生产。",
+      "should_refuse": false,
+      "relevant_evidence": [
+        {
+          "id": "prod-denial",
+          "filename": "version-policy.md",
+          "contains": "In production, the Atlas gateway must not write request bodies to Redis."
+        },
+        {
+          "id": "staging-limitation",
+          "filename": "version-policy.md",
+          "contains": "This staging permission does not apply to production."
+        }
+      ]
+    }
+  ]
+}

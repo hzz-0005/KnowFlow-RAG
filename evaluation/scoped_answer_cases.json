@@ -1,0 +1,39 @@
+{
+  "version": "knowflow-answer-scope-v1",
+  "note": "固定合成来源的生成层回归，不测试召回。独立模型审核仍需人工抽查。",
+  "cases": [
+    {
+      "id": "table-environment-unknown",
+      "question": "请用表格比较 2026 年 Atlas gateway 在 production 和 staging 的超时及 Redis 请求正文写入权限。没有声明的值请说明。",
+      "sources": ["version-policy.md"],
+      "reference_answer": "production 超时 45 ms，禁止写入请求正文；staging 超时未声明，只允许调试用合成请求正文，不适用于 production。",
+      "required_facts": [
+        {"id": "prod-timeout", "text": "production 2026 超时为 45 ms。"},
+        {"id": "staging-timeout-unknown", "text": "来源没有声明 staging 超时，不能套用 production 的 45 ms。"},
+        {"id": "prod-request-body-denial", "text": "production 不允许将请求正文写入 Redis。"},
+        {"id": "staging-debug-synthetic-only", "text": "staging 允许调试用合成请求正文写入 Redis，此许可不适用于 production。"}
+      ]
+    },
+    {
+      "id": "worker-service-identity",
+      "question": "Which component receives API Gateway traffic, and where is that component deployed? Distinguish explicit facts from missing information.",
+      "sources": ["gateway.md", "deployment.md"],
+      "reference_answer": "API Gateway routes to Mercury worker. Only Mercury production service is explicitly located in Beijing; the worker location is not separately established.",
+      "required_facts": [
+        {"id": "gateway-worker", "text": "API Gateway routes traffic to Mercury worker."},
+        {"id": "service-beijing", "text": "Mercury production service is deployed in Beijing."},
+        {"id": "worker-location-not-explicit", "text": "The worker's location is not explicitly stated; do not assume the worker and production service are identical."}
+      ]
+    },
+    {
+      "id": "request-bodies-versus-all-writes",
+      "question": "Atlas gateway 在生产环境是不是禁止对 Redis 做任何写入？请严格区分请求正文和其他数据。",
+      "sources": ["version-policy.md"],
+      "reference_answer": "原文禁止的是将请求正文写入 Redis；无法从中推出禁止任何写入，其他数据的写入权限没有说明。",
+      "required_facts": [
+        {"id": "request-bodies-only", "text": "生产环境禁止将请求正文写入 Redis。"},
+        {"id": "other-writes-unknown", "text": "原文没有声明其他数据的写入权限，不能推断禁止所有写入。"}
+      ]
+    }
+  ]
+}

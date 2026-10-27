@@ -1,0 +1,288 @@
+{
+  "schema_version": "conversation-development-scenarios-v1.1",
+  "sample_role": "developer_authored_synthetic_controls",
+  "independent_review_status": "not_established",
+  "semantic_task_success": null,
+  "scenarios": [
+    {
+      "id": "cold_explicit_zh",
+      "dimensions": [
+        "referent_resolution",
+        "task_completeness"
+      ],
+      "rationale": "时间措辞之前不表示缺少对象；明确文档名的完整首问可独立检索。",
+      "turns": [
+        {
+          "question": "之前发布的 Atlas 设备手册里，校准周期是多少？",
+          "status": "standalone",
+          "references": [],
+          "required_raw_turns": []
+        }
+      ]
+    },
+    {
+      "id": "cold_explicit_en",
+      "dimensions": [
+        "referent_resolution",
+        "task_completeness"
+      ],
+      "rationale": "continue是句中的普通动词，不必承接上轮。",
+      "turns": [
+        {
+          "question": "Which checks does the Vela parser continue to run after a timeout?",
+          "status": "standalone",
+          "references": [],
+          "required_raw_turns": []
+        }
+      ]
+    },
+    {
+      "id": "clarify_supplement_switch",
+      "dimensions": [
+        "referent_resolution",
+        "topic_boundary",
+        "abstention_appropriateness"
+      ],
+      "rationale": "冷会话缺对象须澄清；补名称时保留原问；之后新任务清除继承。",
+      "turns": [
+        {
+          "question": "它多久校准一次？",
+          "status": "clarify",
+          "references": [],
+          "scripted_question": "你指的是哪台设备？",
+          "required_raw_turns": []
+        },
+        {
+          "question": "Atlas 温度传感器。",
+          "status": "resolved",
+          "references": [
+            1
+          ],
+          "scripted_question": "Atlas 温度传感器多久校准一次？",
+          "required_raw_turns": [
+            1
+          ]
+        },
+        {
+          "question": "换个问题：查询 Lumen 的差旅报销期限。",
+          "status": "standalone",
+          "references": [],
+          "required_raw_turns": []
+        }
+      ]
+    },
+    {
+      "id": "correction_with_exclusions",
+      "dimensions": [
+        "scope_and_corrections",
+        "task_completeness"
+      ],
+      "rationale": "否定、版本和范围的更正必须作为原话逐轮传递，不能仅看改写。",
+      "turns": [
+        {
+          "question": "查询 Lumen 2024 正式版差旅规则，只看境内，排除草案。",
+          "status": "standalone",
+          "references": [],
+          "required_raw_turns": []
+        },
+        {
+          "question": "年份改成2025，不是2024；境外的先别算。",
+          "status": "resolved",
+          "references": [
+            1
+          ],
+          "scripted_question": "Lumen 2025正式版境内差旅规则，排除2024、境外和草案。",
+          "required_raw_turns": [
+            1
+          ]
+        },
+        {
+          "question": "那申请期限呢？简短说。",
+          "status": "resolved",
+          "references": [
+            2
+          ],
+          "scripted_question": "Lumen 2025正式版境内差旅申请期限，排除2024、境外和草案。",
+          "required_raw_turns": [
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "topic_switch_then_ellipsis",
+      "dimensions": [
+        "topic_boundary",
+        "referent_resolution",
+        "scope_and_corrections"
+      ],
+      "rationale": "新话题后的省略问不能复活旧对象或旧排除条件。",
+      "turns": [
+        {
+          "question": "查询 Atlas 的校准规定，只看实验室设备，排除室外设备。",
+          "status": "standalone",
+          "references": [],
+          "required_raw_turns": []
+        },
+        {
+          "question": "换个问题：Vela 解析器在超时后怎样恢复？",
+          "status": "standalone",
+          "references": [],
+          "required_raw_turns": []
+        },
+        {
+          "question": "最多重试几次？",
+          "status": "resolved",
+          "references": [
+            2
+          ],
+          "scripted_question": "Vela 解析器在超时后最多重试几次？",
+          "required_raw_turns": [
+            2
+          ],
+          "forbidden_payload_text": [
+            "Atlas",
+            "排除室外设备"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ordinal_without_entity_list",
+      "dimensions": [
+        "referent_resolution",
+        "abstention_appropriateness"
+      ],
+      "rationale": "文档来源顺序不是设备或交易列表；缺少可定位实体时须澄清。",
+      "turns": [
+        {
+          "question": "查询设备维护负责人的规定。",
+          "status": "standalone",
+          "references": [],
+          "required_raw_turns": []
+        },
+        {
+          "question": "第二个的负责人呢？",
+          "status": "clarify",
+          "references": [],
+          "scripted_question": "请写明设备名称；现有来源顺序不能确定负责人对应的设备。",
+          "required_raw_turns": []
+        },
+        {
+          "question": "我指 Boreal 设备。",
+          "status": "resolved",
+          "references": [
+            2
+          ],
+          "scripted_question": "Boreal 设备维护的负责人是谁？",
+          "required_raw_turns": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "source_text_cannot_be_old_answer",
+      "dimensions": [
+        "source_support",
+        "scope_and_corrections"
+      ],
+      "rationale": "上下文只传用户原话和版本核验的来源身份；旧助手结论不能成为检索证据。",
+      "turns": [
+        {
+          "question": "查询 Boreal 正式维护规则，不要使用宣传页。",
+          "status": "standalone",
+          "references": [],
+          "required_raw_turns": []
+        },
+        {
+          "question": "它的复检周期呢？",
+          "status": "resolved",
+          "references": [
+            1
+          ],
+          "scripted_question": "Boreal 正式维护规则中的复检周期，不使用宣传页。",
+          "required_raw_turns": [
+            1
+          ],
+          "forbidden_payload_text": [
+            "SCRIPTED_ASSISTANT_NOT_EVIDENCE"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "failed_turn_does_not_consume_pending",
+      "dimensions": [
+        "referent_resolution",
+        "task_completeness"
+      ],
+      "rationale": "一次服务失败须留在全轨迹，不能消费尚待补全的对象或伪装语义成功。",
+      "turns": [
+        {
+          "question": "它的维护周期呢？",
+          "status": "clarify",
+          "references": [],
+          "scripted_question": "请补充设备名称。",
+          "required_raw_turns": []
+        },
+        {
+          "question": "Atlas 设备。",
+          "status": "resolved",
+          "references": [
+            1
+          ],
+          "scripted_question": "Atlas 设备的维护周期是多少？",
+          "required_raw_turns": [
+            1
+          ],
+          "query_failure": true
+        },
+        {
+          "question": "还是查 Atlas 设备。",
+          "status": "resolved",
+          "references": [
+            1
+          ],
+          "scripted_question": "Atlas 设备的维护周期是多少？",
+          "required_raw_turns": [
+            1
+          ]
+        }
+      ]
+    }
+  ],
+  "memory_state_controls": [
+    {
+      "id": "memory_lifecycle",
+      "test": "backend/tests/test_memory.py::test_memory_lifecycle_namespace_revision_and_deletion",
+      "purpose": "命名空间、修订冲突与删除"
+    },
+    {
+      "id": "memory_expiry",
+      "test": "backend/tests/test_memory.py::test_recall_expiry_candidates_disabled_and_cross_project",
+      "purpose": "候选、禁用、过期与跨库隔离"
+    },
+    {
+      "id": "memory_conflict",
+      "test": "backend/tests/test_memory.py::test_conflicting_aliases_clarify_without_query",
+      "purpose": "同名冲突不猜测"
+    },
+    {
+      "id": "memory_transitive_invalidation",
+      "test": "backend/tests/test_memory.py::test_transitive_alias_deletion_invalidates_latest_followup_not_just_first_turn",
+      "purpose": "继承链不复活已失效别名"
+    },
+    {
+      "id": "task_resume",
+      "test": "backend/tests/test_memory.py::test_task_save_resume_across_conversations_idempotency_and_cancel",
+      "purpose": "跨对话恢复、幂等和取消"
+    },
+    {
+      "id": "task_retry",
+      "test": "backend/tests/test_memory.py::test_failed_task_retry_lineage_and_source_change",
+      "purpose": "失败、重试与来源版本变化"
+    }
+  ]
+}

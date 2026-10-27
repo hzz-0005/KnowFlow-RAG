@@ -1,0 +1,29 @@
+{
+  "schema": "knowflow.metric_contracts.v1",
+  "metrics": [
+    {
+      "id": "score",
+      "eligibility": "all",
+      "interval_method": "none",
+      "version": "v1"
+    },
+    {
+      "id": "recall",
+      "eligibility": "evidence",
+      "interval_method": "none",
+      "version": "v1"
+    },
+    {
+      "id": "service_execution_completed",
+      "eligibility": "all",
+      "interval_method": "none",
+      "version": "v1"
+    },
+    {
+      "id": "verified_task_success",
+      "eligibility": "semantic",
+      "interval_method": "none",
+      "version": "v1"
+    }
+  ]
+}

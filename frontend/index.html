@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#eff1ef" />
+    <title>FinCite · 财报引证台</title>
+    <link rel="stylesheet" href="/styles.css?v=20261027-scope-audit-v2" />
+  </head>
+  <body>
+    <section id="auth-view" class="auth-view">
+      <div class="auth-art" aria-hidden="true">
+        <div class="art-sheet sheet-back"></div>
+        <div class="art-sheet sheet-front">
+          <span class="art-line wide"></span><span class="art-line"></span>
+          <span class="art-highlight"></span><span class="art-line short"></span>
+          <span class="art-line wide"></span><span class="art-line short"></span>
+          <span class="art-citation">[1] 来源证据</span>
+        </div>
+        <div class="art-node node-one"></div><div class="art-node node-two"></div>
+        <span class="art-link link-one"></span><span class="art-link link-two"></span>
+      </div>
+      <div class="auth-panel">
+        <a class="brand-lockup" href="#" aria-label="FinCite 首页">
+          <span class="brand-mark">F</span><span>FinCite</span>
+        </a>
+        <div class="auth-copy">
+          <p class="auth-kicker">文档引证</p>
+          <h1 id="auth-title">让每个答案<br />回到原文</h1>
+          <p class="auth-description">把文档整理成可检索的库，并逐条核对答案的出处与页码。</p>
+        </div>
+        <form id="auth-form" class="auth-form">
+          <label for="auth-email">邮箱</label>
+          <input id="auth-email" type="email" autocomplete="email" required placeholder="name@example.com" />
+          <label for="auth-password">密码</label>
+          <input id="auth-password" type="password" autocomplete="current-password" minlength="12" required placeholder="至少 12 位" />
+          <button id="auth-submit" class="button button-primary auth-submit" type="submit">登录</button>
+          <p id="auth-error" class="form-error" role="alert"></p>
+        </form>
+        <p class="auth-switch"><span id="auth-switch-copy">还没有账号？</span> <button id="auth-switch" class="text-button" type="button">创建账号</button></p>
+        <p class="auth-footnote">你的文档只会在你有权限的知识库中检索。</p>
+      </div>
+    </section>
+
+    <div id="app-view" class="app-view is-hidden">
+      <div id="left-pane-divider" class="pane-divider pane-divider-left" role="separator" tabindex="0" aria-label="知识库栏宽度" aria-orientation="vertical" aria-controls="knowledge-sidebar" title="拖动调整知识库栏宽度；方向键微调，Home 最小，End 最大"></div>
+      <div id="right-pane-divider" class="pane-divider pane-divider-right" role="separator" tabindex="0" aria-label="文档栏宽度" aria-orientation="vertical" aria-controls="right-rail" title="拖动调整文档栏宽度；方向键微调，Home 最小，End 最大"></div>
+      <aside id="knowledge-sidebar" class="sidebar">
+        <div class="sidebar-brand-row">
+        <a class="brand-lockup sidebar-brand" href="#">
+          <span class="brand-mark">F</span><span>FinCite</span>
+        </a>
+        <button id="close-sidebar" class="icon-button close-sidebar" type="button" aria-label="收起知识库列表">×</button>
+        </div>
+        <div class="sidebar-heading">
+          <span>知识库</span>
+          <button id="new-kb" class="icon-button" type="button" aria-label="新建知识库" title="新建知识库">＋</button>
+        </div>
+        <nav id="kb-list" class="kb-list" aria-label="知识库列表"></nav>
+        <div class="sidebar-bottom">
+          <div class="sidebar-note"><span class="signal-dot"></span><span>检索服务已连接</span></div>
+          <button id="logout" class="account-button" type="button">
+            <span class="avatar">F</span><span class="account-copy"><strong>我的工作区</strong><small>退出登录</small></span><span class="account-more">···</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-column">
+        <header class="topbar">
+          <div class="breadcrumb"><span>工作区</span><span class="crumb-slash">/</span><strong id="current-kb-name">选择知识库</strong></div>
+          <div class="topbar-right"><span class="privacy-label"><span class="lock-icon">◆</span>私有知识库</span><button id="mobile-menu" class="icon-button mobile-menu" type="button" aria-label="打开知识库列表" aria-controls="knowledge-sidebar" aria-expanded="false">☰</button></div>
+        </header>
+
+        <section id="welcome-state" class="welcome-state is-hidden">
+          <div class="welcome-mark">F</div>
+          <p class="section-kicker">从文档开始</p>
+          <h1>把散落的知识<br />整理成可验证的答案</h1>
+          <p>创建一个知识库，上传技术文档，再用引用检查回答是否有依据。</p>
+          <button class="button button-primary" data-action="new-kb" type="button">创建知识库</button>
+        </section>
+
+        <div id="workspace" class="workspace is-hidden">
+          <section class="query-area" aria-labelledby="workspace-title">
+            <h1 id="workspace-title" class="sr-only">知识库对话</h1>
+            <div class="conversation-surface">
+            <p class="sr-only">可以接着追问。每次回答都会重新查找文档依据。</p>
+            <div id="conversation-history" class="conversation-history" aria-label="对话记录"><div class="chat-empty"><span>从一个问题开始</span><p>发送消息后，在这里继续对话。</p></div></div>
+            <button id="older-turns" type="button" class="text-button is-hidden">更早的记录</button>
+            <p id="conversation-status" class="sr-only" role="status"></p>
+            <form id="query-form" class="query-form">
+              <div class="composer-entry">
+              <label class="sr-only" for="question">你的问题</label>
+              <textarea id="question" rows="1" maxlength="4000" placeholder="输入问题，或接着追问…"></textarea>
+              <button id="ask-button" class="button button-primary ask-button" type="submit"><span>发送</span><span class="button-arrow" aria-hidden="true">↗</span></button>
+              </div>
+              <div class="query-controls">
+                <div class="query-options">
+                  <label class="select-wrap" for="strategy"><span>检索</span>
+                    <select id="strategy" aria-label="检索方式">
+                      <option value="hybrid">混合检索</option>
+                      <option value="vector">语义检索</option>
+                      <option value="keyword">关键词检索</option>
+                      <option value="hybrid_rerank">混合 + 重排序</option>
+                      <option value="graph">图谱检索</option>
+                      <option value="graph_hybrid">图谱 + 文本</option>
+                    </select>
+                  </label>
+                  <label class="select-wrap top-k-wrap" for="top-k"><span>召回</span>
+                    <select id="top-k" aria-label="基础召回数"><option>1</option><option>3</option><option selected>5</option><option>8</option><option>10</option></select>
+                  </label>
+                  <label class="reference-toggle" title="补充文内引用证据（表、图注、章节）"><input id="expand-references" type="checkbox" checked aria-label="补充文内引用证据（表、图注、章节）" /> 引用展开</label>
+                </div>
+              </div>
+            </form>
+            <p id="query-error" class="inline-error" role="alert"></p>
+            <button id="reload-records" type="button" class="text-button reload-records is-hidden">重新加载记录</button>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <aside id="right-rail" class="right-rail is-hidden">
+        <section class="rail-section documents-section">
+          <div class="rail-title-row"><div><h2>文档</h2><p id="document-count">尚未添加文档</p></div><label class="button button-small button-outline upload-button" for="file-input">上传文档</label></div>
+          <input id="file-input" class="sr-only" type="file" accept=".pdf,.docx,.md,.txt,.csv,.xlsx" multiple />
+          <p id="upload-error" class="inline-error" role="alert"></p>
+          <div id="document-list" class="document-list"></div>
+          <div id="empty-documents" class="empty-documents"><span class="empty-file">＋</span><strong>添加第一份文档</strong><span>支持 PDF、DOCX、Markdown、TXT、CSV 和 XLSX</span></div>
+        </section>
+        <section class="rail-section batch-section">
+          <div class="rail-title-row"><div><h2>批量摄入</h2><p id="batch-overview">一次可上传 1–20 个文件</p></div></div>
+          <button id="open-batches" class="button button-small button-outline" type="button">查看批任务</button>
+        </section>
+        <section class="rail-section memory-section">
+          <div class="rail-title-row"><h2>继续工作</h2></div>
+          <button id="open-tasks" type="button" class="button button-small button-outline">任务检查点</button>
+          <button id="open-memories" type="button" class="button button-small button-outline">长期记忆</button>
+          <p class="retrieval-note">任务可跨对话恢复；记忆需启用后使用。</p>
+        </section>
+        <section class="rail-section evaluation-section">
+          <button id="open-graph" class="button button-small button-outline" type="button">图谱与证据</button>
+          <button id="open-quality" class="button button-small button-outline" type="button">质量验证</button>
+          <div class="rail-title-row"><div><h2>检索实验</h2><p>固定问题集的结果</p></div><span class="experiment-glyph">∿</span></div>
+          <div id="evaluation-list" class="evaluation-list"></div>
+          <p id="empty-evaluations" class="empty-evaluations">还没有实验记录。<br />运行本地评测命令后，结果会显示在这里。</p>
+        </section>
+        <p class="rail-footnote">回答只引用当前知识库中已处理的文档。</p>
+      </aside>
+    </div>
+
+    <dialog id="answer-dialog" class="source-dialog answer-detail-dialog" aria-labelledby="answer-detail-title">
+      <div class="dialog-heading"><h2 id="answer-detail-title">回答详情</h2><button id="close-answer" class="icon-button" type="button" aria-label="关闭回答详情">×</button></div>
+      <p id="answer-detail-question" class="answer-detail-question"></p>
+      <div id="answer-resolution"></div>
+      <div id="answer-panel" class="answer-panel is-hidden" aria-live="polite"></div>
+    </dialog>
+    <dialog id="memory-dialog" class="source-dialog memory-dialog" aria-labelledby="memory-title">
+      <div class="dialog-heading"><h2 id="memory-title">长期记忆</h2><button id="close-memories" type="button" class="icon-button" aria-label="关闭长期记忆">×</button></div>
+      <p class="retrieval-note">偏好控制表达；别名和备注只帮助理解问题，不能代替文档证据。当前问题优先。候选不会自动生效。</p>
+      <form id="memory-form" class="memory-editor">
+        <label>范围<select id="memory-scope"><option value="knowledge_base">当前知识库</option><option value="user">我的所有知识库</option></select></label>
+        <label>类型<select id="memory-kind"><option value="alias">对象别名</option><option value="note">用户备注</option><option value="preference">表达偏好</option></select></label>
+        <label>名称 / 匹配词<input id="memory-key" required minlength="2" maxlength="100" placeholder="例如：我的测试归档" /></label>
+        <label>内容<textarea id="memory-content" rows="2" required maxlength="800" placeholder="例如：PineVault staging archive。备注是用户提供的信息。"></textarea></label>
+        <p id="memory-kind-help" class="retrieval-note">别名和备注按名称字面匹配，不会自动推断同义词。</p>
+        <label>有效期（可空）<input id="memory-expiry" type="datetime-local" /></label>
+        <label>状态<select id="memory-status"><option value="candidate">候选，暂不使用</option><option value="active">启用</option><option value="disabled">停用</option></select></label>
+        <div class="dialog-actions"><button id="memory-reset" type="button" class="button button-outline">新建 / 取消更正</button><button id="memory-save" type="submit" class="button button-primary">保存记忆</button></div>
+      </form>
+      <p id="memory-error" class="inline-error" role="alert"></p>
+      <div id="memory-list"></div><button id="memory-more" type="button" class="text-button is-hidden">更多记忆</button>
+    </dialog>
+    <dialog id="tasks-dialog" class="source-dialog" aria-labelledby="tasks-title">
+      <div class="dialog-heading"><h2 id="tasks-title">任务检查点</h2><button id="close-tasks" type="button" class="icon-button" aria-label="关闭任务检查点">×</button></div>
+      <p class="retrieval-note">在回答下方保存任务。恢复时开启新对话，重新检索完整任务与新条件；旧回答不作为事实。完成仅表示执行结束，依赖步骤没有自动执行器。</p>
+      <p id="tasks-error" class="inline-error" role="alert"></p><div id="tasks-list"></div>
+      <button id="tasks-more" type="button" class="text-button is-hidden">更多任务</button>
+    </dialog>
+    <dialog id="batch-dialog" class="source-dialog">
+      <div class="dialog-heading"><h2>批量摄入任务</h2><button id="close-batches" class="icon-button" type="button" aria-label="关闭批任务">×</button></div>
+      <p>关闭页面后仍会处理。暂时故障自动重试，每轮最多三次；手动追加预算后，单文件总尝试最多九次。拒收文件需修正后另开一批。</p>
+      <div id="batch-list"></div>
+    </dialog>
+
+    <dialog id="kb-dialog" class="kb-dialog">
+      <form id="kb-form" method="dialog">
+        <div class="dialog-heading"><div><p class="section-kicker">新建空间</p><h2>创建知识库</h2></div><button id="close-kb" class="icon-button" type="button" aria-label="关闭">×</button></div>
+        <label for="kb-name">知识库名称</label>
+        <input id="kb-name" name="name" maxlength="200" required placeholder="例如：平台运维手册" />
+        <p id="kb-error" class="form-error" role="alert"></p>
+        <div class="dialog-actions"><button class="button button-outline" value="cancel" type="button" id="cancel-kb">取消</button><button class="button button-primary" type="submit">创建知识库</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="source-dialog" class="source-dialog" aria-labelledby="source-title">
+      <div class="dialog-heading"><div><h2 id="source-title">解析与原页</h2><button id="source-back" class="text-button is-hidden" type="button">返回解析报告</button></div><button id="close-source" class="icon-button" type="button" aria-label="关闭原页">×</button></div>
+      <div id="source-content" aria-live="polite"></div>
+    </dialog>
+    <dialog id="segments-dialog" class="source-dialog" aria-labelledby="segments-title">
+      <div class="dialog-heading"><h2 id="segments-title">切片检查</h2><button id="close-segments" class="icon-button" type="button" aria-label="关闭切片检查">×</button></div>
+      <p class="retrieval-note">索引切片是实际入库的正文；原始解析块用于检查解析顺序和结构。字符数不是 token 数。</p>
+      <form id="segments-form" class="segments-controls">
+        <label>查看<select id="segments-view"><option value="chunks">索引切片</option><option value="blocks">原始解析块</option></select></label>
+        <label>关键词<input id="segments-search" type="search" maxlength="200" placeholder="在当前文档中查找" /></label>
+        <label>页码<input id="segments-page" type="number" min="1" placeholder="全部" /></label>
+        <button class="button button-small button-outline" type="submit">筛选</button>
+      </form>
+      <div id="segments-content" aria-live="polite"></div>
+      <div class="segment-pagination"><button id="segments-prev" type="button" class="button button-small button-outline">上一页</button><span id="segments-range"></span><button id="segments-next" type="button" class="button button-small button-outline">下一页</button></div>
+    </dialog>
+    <dialog id="references-dialog" class="source-dialog" aria-labelledby="references-title">
+      <div class="dialog-heading"><h2 id="references-title">文内引用</h2><button id="close-references" class="icon-button" type="button" aria-label="关闭文内引用">×</button></div>
+      <p class="retrieval-note">核对明确编号的表、图注与章节引用。这里只展示文档结构链接，不把它当作知识事实；来源与目标各展示节选，完整正文请查看切片。</p>
+      <form id="references-form" class="segments-controls">
+        <label>引用状态<select id="references-status"><option value="all">全部</option><option value="resolved">唯一匹配</option><option value="ambiguous">同号歧义</option><option value="missing">目标缺失</option><option value="external_unresolved">外部引用未消解</option></select></label>
+        <button type="submit" class="button button-small button-outline">筛选引用</button>
+        <button id="rebuild-references" type="button" class="button button-small button-outline">更新引用索引</button>
+      </form>
+      <div id="references-content" aria-live="polite"></div>
+      <div class="segment-pagination"><button id="references-prev" type="button" class="button button-small button-outline">上一页</button><span id="references-range"></span><button id="references-next" type="button" class="button button-small button-outline">下一页</button></div>
+    </dialog>
+    <dialog id="ocr-dialog" class="source-dialog" aria-labelledby="ocr-title">
+      <div class="dialog-heading"><h2 id="ocr-title">单页 OCR 对照</h2><button id="close-ocr" class="icon-button" type="button" aria-label="关闭 OCR 对照">×</button></div>
+      <p class="retrieval-note">选择可疑页面，与强制 OCR 结果比较。基线来自当前保存的正文解析块，排除页眉、页脚和图片；不拼接重叠切片。仅生成核对候选，不替换切片、向量或图谱。</p>
+      <form id="ocr-form" class="segments-controls">
+        <label>原页码<input id="ocr-page" type="number" min="1" value="1" required /></label>
+        <button type="submit" class="button button-small button-outline">加载该页</button>
+        <button id="ocr-start" type="button" class="button button-small button-primary">运行单页 OCR</button>
+      </form>
+      <div id="ocr-content" aria-live="polite"></div>
+    </dialog>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <dialog id="graph-dialog" class="source-dialog" aria-labelledby="graph-title">
+      <div class="dialog-heading"><h2 id="graph-title">图谱与证据</h2><button id="close-graph" class="icon-button" type="button" aria-label="关闭图谱">×</button></div>
+      <p>从文档抽取实体节点和有来源的关系边，供图谱检索沿关联查找原文；不替代版本判定、计算或图片理解。</p>
+      <form id="graph-form" class="segments-controls"><label>实体或关系<input id="graph-search" type="search" maxlength="200" /></label><label>关系状态<select id="graph-status"><option value="all">全部候选</option><option value="supported">可用于图谱检索</option><option value="excluded">缺乏依据或矛盾</option><option value="unknown">审核未知</option><option value="unreviewed">旧索引未审核</option></select></label><button type="submit" class="button button-small button-outline">筛选关系</button></form>
+      <div id="graph-content"></div><div class="segment-pagination"><button id="graph-prev" type="button">上一页</button><span id="graph-range"></span><button id="graph-next" type="button">下一页</button></div>
+    </dialog>
+    <dialog id="quality-dialog" class="source-dialog" aria-labelledby="quality-title">
+      <div class="dialog-heading"><h2 id="quality-title">质量验证</h2><button id="close-quality" class="icon-button" type="button" aria-label="关闭质量验证">×</button></div>
+      <form id="quality-form" class="segments-controls">
+        <label>固定题集<select id="quality-dataset"><option value="engineering">合成工程文档（需六份配套 MD）</option><option value="tables">DocLayNet Table 5 中英与拒答</option><option value="crosspage">TableFormer 跨页中英</option><option value="custom">自定义题集</option></select></label>
+        <label>自定义题集 JSON（最多 1 MB）<input id="quality-file" type="file" accept=".json,application/json" /></label>
+        <label>召回数量<select id="quality-k"><option>3</option><option selected>5</option><option>8</option></select></label>
+        <label>历史回归基线<select id="quality-baseline"><option value="">不对比历史</option></select></label>
+        <label><input id="quality-graph" type="checkbox" /> 对比图谱 + 文本</label>
+        <label><input id="quality-judge" type="checkbox" checked /> 评审答案（图谱模式同时审关系）</label>
+        <button type="submit" class="button button-small button-primary">开始质量验证</button>
+      </form>
+      <p class="retrieval-note">需要固定问题、标准答案与来源标注。配套文件未就绪会明确提示；模型评审会调用已配置的 LLM，结果为估算。运行中每题保存，进程重启后显示中断。</p>
+      <p class="retrieval-note">Recall 看标准证据找回多少；MRR 看第一条相关结果排第几；nDCG 看整体排序；完整证据率看是否同时拿到全部必要来源。找到证据仍不等于回答正确。</p>
+      <div id="quality-content" aria-live="polite"></div>
+    </dialog>
+    <div id="chat-context-menu" class="chat-context-menu" role="menu" aria-label="对话操作" hidden>
+      <button type="button" role="menuitem" data-chat-context-action="delete">删除对话</button>
+    </div>
+    <div id="kb-context-menu" class="chat-context-menu kb-context-menu" role="menu" aria-label="知识库操作" hidden>
+      <button type="button" role="menuitem" data-kb-context-action="toggle">展开聊天</button>
+      <button type="button" role="menuitem" data-kb-context-action="delete">删除知识库</button>
+    </div>
+    <script src="/app.js?v=20261027-scope-audit-v2" type="module"></script>
+  </body>
+</html>

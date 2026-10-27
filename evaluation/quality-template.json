@@ -1,0 +1,31 @@
+{
+  "version": "my-corpus-v1",
+  "source": "由标注者核对原文件后填写；不要让生成模型自行认定标准答案",
+  "cases": [
+    {
+      "id": "question-1",
+      "question_type": "single_fact",
+      "question": "设备 A 的复核周期是多少？",
+      "reference_answer": "17 天，仅适用于测试环境。",
+      "should_refuse": false,
+      "required_facts": [
+        {
+          "id": "period",
+          "text": "复核周期为 17 天"
+        },
+        {
+          "id": "scope",
+          "text": "仅适用于测试环境"
+        }
+      ],
+      "relevant_evidence": [
+        {
+          "id": "source-1",
+          "filename": "请替换成实际文档名.pdf",
+          "contains": "请替换成解析后可核对的实际原文，保留对象和适用条件"
+        }
+      ],
+      "equivalence_group": "device-a-period"
+    }
+  ]
+}

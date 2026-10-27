@@ -1,0 +1,18 @@
+{
+  "version": "context-routing-controls-v1",
+  "sample_role": "developer_authored_synthetic_controls_not_blind_semantic_benchmark",
+  "loader_contract": "question_repeat_expand-v1",
+  "cases": [
+    {"id":"zh_ellipsis","question":"保留多久？","history":[{"id":"pine","question":"请介绍 PineVault 的归档规则，只看测试空间，不包括生产空间。"}],"expected":{"status":"resolved","references":["pine"]},"rationale":"省略主语但没有指代触发词，仍需继承对象和原始排除条件。"},
+    {"id":"en_scope_ellipsis","question":"And in production?","history":[{"id":"build","question":"Describe the retry policy of EmberBuild in staging."}],"expected":{"status":"resolved","references":["build"]},"rationale":"承接对象、更改范围，不要求出现 it/they。"},
+    {"id":"zh_scope_ellipsis","question":"生产空间的呢？","history":[{"id":"pine","question":"查询 PineVault 测试空间的归档保留期。"}],"expected":{"status":"resolved","references":["pine"]},"rationale":"口语范围切换需继续同一对象。"},
+    {"id":"en_date_correction","question":"2025, not 2024 please.","history":[{"id":"journal","question":"Which 2024 version of the Kestrel ledger rule applies? Exclude draft rules."}],"expected":{"status":"resolved","references":["journal"]},"rationale":"非标准输入的年份更正，保留当前数字及原始规则范围。"},
+    {"id":"zh_new_topic","question":"换个问题：CedarHub 的备份保留天数是多少？","history":[{"id":"pine","question":"查询 PineVault 的测试空间，排除生产空间。"}],"expected":{"status":"standalone","references":[]},"rationale":"独立问题不得继承旧产品、环境或排除条件。"},
+    {"id":"en_new_topic","question":"Different topic: How does AuroraMail authenticate incoming messages?","history":[{"id":"stock","question":"Only compare archived inventory rows, not current rows."}],"expected":{"status":"standalone","references":[]},"rationale":"跨领域新话题保持当前输入逐字一致。"},
+    {"id":"ordinal_without_options","question":"What does the second one mean?","history":[{"id":"audit","question":"What are the audit options in the handbook?"}],"expected":{"status":"clarify","references":[]},"rationale":"没有助手选项列表，不猜 second 指哪一项。"},
+    {"id":"zh_explicit_correction","question":"改为生产空间，不要沿用测试空间。","history":[{"id":"pine","question":"查询 PineVault 测试空间的归档规则。"}],"expected":{"status":"resolved","references":["pine"]},"rationale":"保留原有明确更正路径作为迁移控制，不让本轮更正被旧范围覆盖。"},
+    {"id":"cold_reference","question":"它的保留期是多少？","history":[],"expected":{"status":"clarify","references":[]},"rationale":"冷会话明确指代缺对象，禁止猜测。"},
+    {"id":"cold_independent","question":"Explain the CedarHub backup policy.","history":[],"expected":{"status":"standalone","references":[]},"rationale":"独立首问不新增上下文解析调用。"},
+    {"id":"recent_intent_budget_barrier","question":"它的保留期呢？","history":[{"id":"recent","question_repeat":{"text":"New topic: PolarDepot production policy with all exclusions intact. ","count":9000}},{"id":"obsolete","question":"PineVault retention in staging."}],"expected":{"status":"clarify","references":[]},"rationale":"最近一轮整条超预算时不能跳过它并把旧话题当作当前对象。"}
+  ]
+}

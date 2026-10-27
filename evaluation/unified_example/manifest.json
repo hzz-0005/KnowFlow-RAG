@@ -1,0 +1,36 @@
+{
+  "schema": "knowflow.m1.manifest.v1",
+  "root": ".",
+  "completion_views": [
+    "any",
+    "final"
+  ],
+  "contracts": {
+    "path": "contracts.json",
+    "sha256": "db2e231c91a59ceba8dcc282fbe595d05d5d37a53143b9b2edc3123331efb519"
+  },
+  "datasets": [
+    {
+      "id": "fixture",
+      "family": "fixture",
+      "path": "dataset.json",
+      "sha256": "b10fd07000fcbb12ace79d2933b857990181287c3780dfb41e544da8555c2ee5"
+    }
+  ],
+  "runs": [
+    {
+      "id": "run1",
+      "path": "run1.json",
+      "sha256": "fe7d5d41b29fb67e9f8d2ebf4c8f46432a874892043c13443e7b3d733113f07d",
+      "adapter": "ledger_v1",
+      "input_granularity": "per_sample",
+      "dataset_id": "fixture",
+      "strategies": [
+        "hybrid"
+      ],
+      "comparison_fingerprint": "explicit-fixture-matched-budget"
+    }
+  ],
+  "artifacts": [],
+  "comparisons": []
+}

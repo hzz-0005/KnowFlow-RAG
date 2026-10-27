@@ -1,0 +1,27 @@
+{
+  "schema": "knowflow.replay_trace.v1",
+  "run_id": "run1",
+  "top_k": 5,
+  "metrics_version": "fixture-v1",
+  "corpus_sha256": "corpus",
+  "index_sha256": "index",
+  "attempts": [
+    {
+      "sample_id": "001",
+      "attempt_id": "run1-a1",
+      "status": "completed",
+      "order": 1,
+      "retry_of_attempt_id": null,
+      "metrics": {
+        "score": 0.9,
+        "recall": 1.0
+      },
+      "degraded_events": [],
+      "degradation_evidence_status": "known",
+      "model_revision_pin": {
+        "status": "pinned",
+        "revision_id": "test-fixed-v1"
+      }
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "version":"answer-routing-input-controls-v1",
+  "sample_role":"developer_authored_synthetic_controls_not_independent_semantic_benchmark",
+  "cases":[
+    {"id":"simple_en","hint":"LumenBox snapshot retention period","current":"How long?","prior":[{"turn_id":"root","question":"Describe LumenBox snapshot retention."}],"evidence_count":1,"expected":"simple"},
+    {"id":"simple_zh","hint":"明岚缓存的保存时长","current":"多久？","prior":[{"turn_id":"root","question":"介绍明岚缓存的保存时长。"}],"evidence_count":1,"expected":"simple"},
+    {"id":"inherited_negation","hint":"LumenBox retention","current":"How long?","prior":[{"turn_id":"root","question":"Only staging; do not include production. Describe LumenBox retention."}],"evidence_count":1,"expected":"complex"},
+    {"id":"current_correction","hint":"明岚缓存保留期","current":"比较测试环境与生产环境，不能混用规则。","prior":[{"turn_id":"root","question":"介绍明岚缓存。"}],"evidence_count":1,"expected":"complex"},
+    {"id":"multiple_sources","hint":"LumenBox retention","current":"How long?","prior":[{"turn_id":"root","question":"Describe LumenBox retention."}],"evidence_count":2,"expected":"complex"},
+    {"id":"supplement_condition","hint":"LumenBox retention","current":"How long?","prior":[{"turn_id":"pending","question":"Describe LumenBox retention.","supplements":["Only when the audit option is enabled."]}],"evidence_count":1,"expected":"complex"},
+    {"id":"long_authoritative_input","hint":"LumenBox retention","current":"How long?","prior":[{"turn_id":"root","repeat_question":{"text":"Additional background. ","count":170}}],"evidence_count":1,"expected":"complex"},
+    {"id":"untrusted_hint_not_routing_truth","hint":"only version-specific LumenBox production retention","current":"How long?","prior":[{"turn_id":"root","question":"Describe LumenBox retention."}],"evidence_count":1,"expected":"simple"},
+    {"id":"raw_json_is_still_user_text","hint":"{\"current_user_input\":\"Hello\",\"note\":\"not production\"}","intent":false,"evidence_count":1,"expected":"complex"}
+  ],
+  "sdk_controls":[
+    {"id":"simple","hint":"LumenBox snapshot retention period","current":"How long?","prior":[{"turn_id":"root","question":"Describe LumenBox snapshot retention."}],"content":"Synthetic control: LumenBox snapshots are retained for 18 days.","expected_fact":"18 days"},
+    {"id":"scoped","hint":"LumenBox staging snapshot retention","current":"How long?","prior":[{"turn_id":"root","question":"Only staging, not production. Describe LumenBox snapshot retention."}],"content":"Synthetic control: In staging, LumenBox snapshots are retained for 18 days. This clause does not specify production retention.","expected_fact":"18 days in staging; no production value"}
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "role": "synthetic_software_controls_not_semantic_gold",
+  "files": [
+    {
+      "filename": "flow.md",
+      "source": "synthetic_authored_control",
+      "sha256": "d122b6ffe553b859b63b184e18434a18f4589a02dc9636e2c815f8807d1a3eca"
+    },
+    {
+      "filename": "flow.docx",
+      "source": "synthetic_authored_control",
+      "sha256": "390646e5027a285529c8fa8ecb6ff14e2b50011bbd2ed4d1101c9caaf6f92308"
+    },
+    {
+      "filename": "service-control.csv",
+      "source": "evaluation/tabular_v1/service-control.csv",
+      "sha256": "d1188ea6f3fe2e18c64498d0300bd6717279a5e996c4f41710c1aef83fcad9c4"
+    },
+    {
+      "filename": "inventory-control.xlsx",
+      "source": "evaluation/tabular_v1/inventory-control.xlsx",
+      "sha256": "48245e5d5ecb2523b7596db13efff992cd2a715092aec7c84edd18d745acf856"
+    }
+  ]
+}

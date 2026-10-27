@@ -1,0 +1,73 @@
+# Isolated software-contract demo. No real provider keys, no production volumes.
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: knowflow
+      POSTGRES_USER: knowflow
+      POSTGRES_PASSWORD: local-smoke-only
+    volumes:
+      - smoke-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U knowflow -d knowflow"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  provider:
+    image: knowflow-rag-smoke-api:local
+    command: ["python", "/smoke/smoke_provider.py"]
+    volumes:
+      - ./scripts/smoke_provider.py:/smoke/smoke_provider.py:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9100/health')"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  api:
+    image: knowflow-rag-smoke-api:local
+    build: .
+    environment:
+      APP_ENV: test
+      DATABASE_URL: postgresql+psycopg://knowflow:local-smoke-only@db:5432/knowflow
+      JWT_SECRET: software-contract-only-not-a-real-deployment-secret
+      EMBEDDING_BASE_URL: http://provider:9100/v1
+      EMBEDDING_API_KEY: local-contract-stub
+      EMBEDDING_MODEL: local-contract-stub
+      EMBEDDING_DIMENSIONS: "2560"
+      LLM_BASE_URL: http://provider:9100/v1
+      LLM_API_KEY: local-contract-stub
+      LLM_MODEL: local-contract-stub
+      LLM_COMPLEX_MODEL: local-contract-stub
+      LLM_SIMPLE_THINKING: disabled
+      LLM_COMPLEX_THINKING: disabled
+      ANSWER_GUARD_ENABLED: "false"
+      ANSWER_REPAIR_ENABLED: "false"
+      RETRIEVAL_ASSESSMENT_ENABLED: "false"
+      QUERY_REWRITE_ENABLED: "false"
+      TASK_PLANNING_ENABLED: "false"
+      ENGLISH_KEYWORD_RETRIEVAL_ENABLED: "false"
+      PDF_PARSER: native
+      UPLOAD_DIR: /app/data/uploads
+    volumes:
+      - smoke-uploads:/app/data/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+      provider:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  frontend:
+    build: ./frontend
+    image: knowflow-rag-smoke-frontend:local
+    ports:
+      - "127.0.0.1:${SMOKE_FRONTEND_PORT:-0}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+volumes:
+  smoke-db:
+  smoke-uploads:

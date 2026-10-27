@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "knowflow-rag"
+version = "0.1.0"
+description = "An independently implemented, evidence-grounded RAG system with graph-enhanced retrieval."
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "alembic>=1.13,<2",
+    "email-validator>=2.2,<3",
+    "fastapi>=0.115,<1",
+    "httpx>=0.27,<1",
+    "jieba>=0.42.1,<1",
+    "openai>=1.55,<3",
+    "openpyxl>=3.1.5,<4",
+    "defusedxml>=0.7.1,<1",
+    "pgvector>=0.3,<1",
+    "PyJWT>=2.9,<3",
+    "psycopg[binary]>=3.2,<4",
+    "pwdlib[argon2]>=0.2,<1",
+    "pydantic-settings>=2.6,<3",
+    "pypdf>=5,<7",
+    "pypdfium2>=4.30,<6",
+    "Pillow>=11,<13",
+    "fonttools>=4.55,<5",
+    "python-docx>=1.1,<2",
+    "python-multipart>=0.0.12,<1",
+    "sqlalchemy[asyncio]>=2.0,<3",
+    "tenacity>=9,<10",
+    "tokenizers>=0.22,<0.23",
+    "uvicorn[standard]>=0.32,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3,<9",
+    "pytest-asyncio>=0.24,<2",
+    "ruff>=0.8,<1",
+]
+
+[tool.setuptools.packages.find]
+where = ["backend"]
+
+[tool.setuptools.package-data]
+"knowflow.app" = ["assets/*.gz", "assets/*.json", "assets/*.md", "assets/*.txt"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["backend/tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+

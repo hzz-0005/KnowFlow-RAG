@@ -1,0 +1,18 @@
+{
+  "version": "fixture-v1",
+  "cases": [
+    {
+      "id": "001",
+      "question": "\u4e2d\u6587\u95ee\u9898,\"\u5f15\u53f7\"\n\u6362\u884c 001",
+      "should_refuse": false,
+      "reference_answer": "example",
+      "relevant_evidence": [
+        {
+          "id": "e",
+          "contains": "x",
+          "filename": "doc.pdf"
+        }
+      ]
+    }
+  ]
+}
